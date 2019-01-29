@@ -1,0 +1,46 @@
+---
+services:
+  - servicekey: consul-ui
+    serviceid: consul-ui1
+    basepath: /ui
+    hostprovider: static
+    host: 127.0.0.1
+    port: 8500
+    public: true
+    scheme: http
+    metadata:
+      some-metadata-here: foo
+      some-more-metadata-here: bar
+  - servicekey: consul-api
+    serviceid: consul-api1
+    basepath: /v1
+    hostprovider: static
+    host: 127.0.0.1
+    port: 8500
+    public: true
+    scheme: http
+    metadata:
+      some-metadata-here: foo
+      some-more-metadata-here: bar
+  - servicekey: traefik-dashboard
+    serviceid: traefik-dashboard1
+    basepath: /dashboard
+    hostprovider: static
+    host: 127.0.0.1
+    port: 8080
+    public: false
+    scheme: http
+    metadata:
+      some-other-metadata-here: baz
+      this-block-can-be-anything: fribble
+  - servicekey: traefik-api
+    serviceid: traefik-api1
+    basepath: /api
+    hostprovider: static
+    host: 127.0.0.1
+    port: 8080
+    public: false
+    scheme: http
+    metadata:
+      some-other-metadata-here: baz
+      this-block-can-be-anything: fribble
