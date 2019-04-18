@@ -12,6 +12,8 @@ type Request struct {
     ServiceKey   string                 `json:"serviceKey"`
     ServiceId    string                 `json:"serviceId"`
     BasePath     string                 `json:"basePath"`
+    HostMatch    string                 `json:"hostMatch"`
+    Rule         string                 `json:"rule"`
     Public       bool                   `json:"public"`
     Scheme       string                 `json:"scheme"`
     Metadata     map[string]interface{} `json:"metadata"`

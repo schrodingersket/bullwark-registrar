@@ -78,25 +78,60 @@ func (r ConsulRegistrar) Register(req Request) error {
     return err
   }
 
-  // Path rule string builder
+  // Build matcher rules. Attempts to combine hostname matching, path matching,
+  // and any other arbitrary user-provided rules.
   //
-  var pathRuleStringBuilder strings.Builder
-  pathRuleStringBuilder.WriteRune('/')
-  pathRuleStringBuilder.WriteString(r.Prefix)
-  pathRuleStringBuilder.WriteString("/frontends/")
-  pathRuleStringBuilder.WriteString(req.ServiceKey)
-  pathRuleStringBuilder.WriteString("/routes/")
-  pathRuleStringBuilder.WriteString(ruleName)
-  pathRuleStringBuilder.WriteString("/rule")
+  var ruleStringBuilder strings.Builder
+  ruleStringBuilder.WriteRune('/')
+  ruleStringBuilder.WriteString(r.Prefix)
+  ruleStringBuilder.WriteString("/frontends/")
+  ruleStringBuilder.WriteString(req.ServiceKey)
+  ruleStringBuilder.WriteString("/routes/")
+  ruleStringBuilder.WriteString(ruleName)
+  ruleStringBuilder.WriteString("/rule")
 
-  _, err = kv.AddKeyValuePair(pathRuleStringBuilder.String(),
-    fmt.Sprintf("PathPrefix:/%s", strings.Trim(req.BasePath, "/")))
+  var ruleBodyStringBuilder strings.Builder
+  var hasRule = false
+
+  // Write base path rule
+  //
+  if req.BasePath != "" {
+    ruleBodyStringBuilder.WriteString(fmt.Sprintf("PathPrefix:/%s",
+      strings.Trim(req.BasePath, "/")))
+
+    hasRule = true
+  }
+
+  // Write hostname match rule
+  //
+  if req.HostMatch != "" {
+    if hasRule {
+      ruleBodyStringBuilder.WriteRune(';')
+    }
+
+    ruleBodyStringBuilder.WriteString(fmt.Sprintf("HostRegexp:%s",
+      req.HostMatch))
+  }
+
+  // Write arbitary rules
+  //
+  if req.Rule != "" {
+
+    if hasRule {
+      ruleBodyStringBuilder.WriteRune(';')
+    }
+
+    ruleBodyStringBuilder.WriteString(req.Rule)
+  }
+
+  _, err = kv.AddKeyValuePair(ruleStringBuilder.String(),
+    ruleBodyStringBuilder.String())
 
   if err != nil {
     return err
   }
 
-  // Path rule string builder
+  // Metadata
   //
   var metadataStringBuilder strings.Builder
   metadataStringBuilder.WriteRune('/')
